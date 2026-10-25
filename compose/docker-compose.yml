@@ -1,0 +1,82 @@
+# Home server stack. All paths and IDs come from .env (see .env.example).
+# Start services by name: sudo docker compose up -d jellyfin
+# A bare "up -d" reconciles every container against this file; do that on purpose only.
+
+services:
+
+  # --- media server, hardware transcoding via Intel Quick Sync ---
+  jellyfin:
+    image: linuxserver/jellyfin:10.10.7
+    container_name: jellyfin
+    restart: unless-stopped
+    environment:
+      - PUID=${PUID}
+      - PGID=${PGID}
+      - TZ=${TZ}
+    devices:
+      - /dev/dri:/dev/dri
+    volumes:
+      - ${APPDATA}/jellyfin:/config
+      - ${MEDIA1}:/Media
+      - ${MEDIA2}:/Media2
+    ports:
+      - "8096:8096"
+
+  # --- linear TV channel built from the Jellyfin library ---
+  ersatztv:
+    image: ghcr.io/ersatztv/legacy
+    container_name: ersatztv
+    restart: unless-stopped
+    environment:
+      - TZ=${TZ}
+    devices:
+      - /dev/dri:/dev/dri
+    volumes:
+      - ${APPDATA}/ersatztv:/config
+      - ${MEDIA1}:/Media:ro
+      - ${MEDIA2}:/Media2:ro
+    ports:
+      - "8409:8409"
+
+  # --- dashboard ---
+  homepage:
+    image: ghcr.io/gethomepage/homepage:latest
+    container_name: homepage
+    restart: unless-stopped
+    env_file:
+      - ${APPDATA}/homepage/.env        # HOMEPAGE_VAR_* API keys for the widgets, never committed
+    environment:
+      - PUID=${PUID}
+      - PGID=${DOCKER_GID}              # needs the docker group to read the socket
+      - TZ=${TZ}
+      - HOMEPAGE_ALLOWED_HOSTS=${HOMEPAGE_ALLOWED_HOSTS}
+    volumes:
+      - ${APPDATA}/homepage:/app/config
+      - ${APPDATA}/homepage/images:/app/public/images
+      - /var/run/docker.sock:/var/run/docker.sock:ro
+    ports:
+      - "3000:3000"
+
+  # --- automation ---
+  n8n:
+    image: n8nio/n8n:latest
+    container_name: n8n
+    restart: unless-stopped
+    environment:
+      - TZ=${TZ}
+      - GENERIC_TIMEZONE=${TZ}
+      - N8N_SECURE_COOKIE=false         # reached over LAN/Tailscale without TLS
+    volumes:
+      - ${APPDATA}/n8n:/home/node/.n8n  # explicit volume: an anonymous one is lost on recreate (restore drill, finding 2)
+    ports:
+      - "5678:5678"
+
+  # --- monitoring ---
+  uptime-kuma:
+    image: louislam/uptime-kuma:1
+    container_name: uptime-kuma
+    restart: unless-stopped
+    volumes:
+      - ${APPDATA}/uptime-kuma:/app/data
+    ports:
+      - "3001:3001"
