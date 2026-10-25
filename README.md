@@ -2,7 +2,7 @@
 
 Configuration and runbooks for my home server: a fanless ZimaBlade (Intel Celeron, 16 GB RAM, two 4 TB disks) running Debian and Docker. It serves media to the living-room TV, runs a linear "live TV" channel built from that library, hosts n8n for personal automations, and monitors itself. Everything is defined in one Compose file; the file in Git is the source of truth, nothing is edited through a GUI.
 
-This repository is the public, cleaned-up version of the private ops repo that the server backs itself up into every week. Secrets, IP addresses and user names are replaced by placeholders; the structure, scripts and lessons are the real ones.
+This repository is the public, cleaned-up version of the private ops repo that the server backs itself up into every week. The structure, scripts and lessons are the real ones.
 
 ## What runs
 
