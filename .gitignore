@@ -1,0 +1,22 @@
+# secrets and local config
+compose/.env
+**/.env
+*.key
+*.pem
+id_rsa
+id_ed25519
+
+# databases and app state never go to git
+*.db
+*.db-shm
+*.db-wal
+*.sqlite*
+**/key-*.xml
+**/*secrets*.json
+**/logs/
+
+# media
+*.mkv
+*.mp4
+*.avi
+*.nfo
