@@ -1,0 +1,13 @@
+[Unit]
+Description=Weekly configuration snapshot to Git
+After=docker.service network-online.target
+Wants=network-online.target
+
+[Service]
+Type=oneshot
+ExecStart=/home/admin/homelab/scripts/config-backup.sh
+Environment=GIT_USER=admin
+Environment=REPO=/home/admin/homelab
+Environment=REDACT_SECRETS=1
+# Optional: Uptime Kuma push monitor, pinged after a successful push
+# Environment=KUMA_PUSH=http://localhost:3001/api/push/<token>

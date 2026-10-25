@@ -1,0 +1,10 @@
+[Unit]
+Description=Run the configuration snapshot weekly
+
+[Timer]
+OnCalendar=Sun 03:00
+Persistent=true
+RandomizedDelaySec=15m
+
+[Install]
+WantedBy=timers.target
